@@ -1,5 +1,5 @@
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder, PowerTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -33,7 +33,6 @@ class FrancTransformer(TransformerMixin, BaseEstimator):
         self._min_frequency = min_frequency
         self._numerical_strategy = numerical_strategy
         self._categorical_fill_value = categorical_fill_value
-        self._skew_threshold = skew_threshold
         self._verbose = verbose
         self._cores = cores
         self._indicator_type = indicator_type
@@ -61,7 +60,7 @@ class FrancTransformer(TransformerMixin, BaseEstimator):
         )
 
         encoder = OneHotEncoder(min_frequency=self._min_frequency, handle_unknown='ignore', sparse_output=False, dtype=self._indicator_type)
-        scaler = StandardScaler()
+        scaler = PowerTransformer()
 
         normalizer = ColumnTransformer(
             transformers=[
@@ -90,9 +89,3 @@ class FrancTransformer(TransformerMixin, BaseEstimator):
     
     def get_feature_names_out(self, input_features=None):
         return self.pipeline_.get_feature_names_out(input_features)
-
-
-
-# there are typically 100s unique values, but only a few frequent, many 1-off that look like errors. Best we can do is ignore them.
-
-
