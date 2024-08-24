@@ -1,7 +1,7 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder, PowerTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.compose import ColumnTransformer
+from sklearn.compose import make_column_selector, ColumnTransformer
 from sklearn.pipeline import Pipeline
 import pandas as pd
 import numpy as np
@@ -38,12 +38,8 @@ class FrancTransformer(TransformerMixin, BaseEstimator):
         self._indicator_type = indicator_type
 
     def fit(self, X, y=None):
-        numerical_columns = X.select_dtypes(include=['number']).columns
-        categorical_columns = X.select_dtypes(include=['object', 'category']).columns
-
-        if self._verbose:
-            print("Numerical columns:", numerical_columns.tolist())
-            print("Categorical columns:", categorical_columns.tolist())
+        numerical_columns = make_column_selector(dtype_include=['number'])
+        categorical_columns = make_column_selector(dtype_include=['object', 'category'])
 
         categorical_imputer = SimpleImputer(missing_values=pd.NA, strategy='constant', fill_value=self._categorical_fill_value)
         numerical_imputer = SimpleImputer(missing_values=pd.NA, strategy=self._numerical_strategy , add_indicator= True)
